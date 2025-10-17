@@ -1,23 +1,13 @@
 import { isRancherPrime } from '@shell/config/version';
 import { Configuration, Distribution } from './types';
 import { MANAGEMENT } from '@shell/config/types';
+import { SETTING } from './settings';
 
 // Default endpoint ($dist is either 'community' or 'prime')
 const DEFAULT_ENDPOINT = 'https://updates.rancher.io/rancher/$dist/updates';
 
 // We only support retrieving content from secure endpoints
 const HTTPS_PREFIX = 'https://';
-
-
-// Adapted from: https://github.com/rancher/ui/blob/08c379a9529f740666a704b52522a468986c3520/lib/shared/addon/utils/constants.js#L564
-// Setting IDs
-export const SETTING = {
-  /**
-   * Dynamic Content settings
-   */
-  DYNAMIC_CONTENT_ENABLED:  'ui-content-enabled',
-  DYNAMIC_CONTENT_ENDPOINT: 'ui-content-endpoint',
-} as const;
 
 /**
  * Get configuration data based on the distribution and Rancher settings

@@ -3,9 +3,9 @@ import day from 'dayjs';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { getVersionData } from '@shell/config/version';
 import { MANAGEMENT } from '@shell/config/types';
-import { SETTING } from '@shell/config/settings';
 import { fetchOrCreateSetting } from '@shell/utils/settings';
 import { getConfig } from '../utils/config';
+import { SETTING } from '../utils/settings';
 
 const UPDATE_DATE_FORMAT = 'YYYY-MM-DD'; // Format of the fetch date
 
