@@ -1,7 +1,7 @@
 {
-  "name": "dynamic-content-test",
+  "name": "dynamic-content",
   "description": "UI to help test the Dynamic Content feature",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": false,
   "rancher": {
     "annotations": {
