@@ -3,6 +3,12 @@ import { IPlugin } from '@shell/core/types';
 import { NAME } from './product';
 import TestPage from './components/TestPage.vue';
 
+let VERSION = '';
+
+export function getVersion() {
+  return VERSION;
+}
+
 // Init the package
 export default function(plugin: IPlugin): void {
   // Auto-import model, detail, edit from the folders
@@ -22,4 +28,6 @@ export default function(plugin: IPlugin): void {
     path:      `/${ NAME }`,
     component: TestPage
   });
+
+  VERSION = plugin.environment.version;
 }

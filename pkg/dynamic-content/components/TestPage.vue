@@ -1,11 +1,11 @@
 <script>
 import day from 'dayjs';
 import { LabeledInput } from '@components/Form/LabeledInput';
-import { getVersionData } from '@shell/config/version';
-import { MANAGEMENT } from '@shell/config/types';
+import { MANAGEMENT, STEVE } from '@shell/config/types';
 import { fetchOrCreateSetting } from '@shell/utils/settings';
 import { getConfig } from '../utils/config';
 import { SETTING } from '../utils/settings';
+import { getVersion } from '../index';
 
 const UPDATE_DATE_FORMAT = 'YYYY-MM-DD'; // Format of the fetch date
 
@@ -26,28 +26,38 @@ export default {
 
   mounted() {
     window.addEventListener('dynamicContentLog', this.dynamicContentLogEvent);
+    this.checkReady();
   },
 
   unmounted() {
     window.removeEventListener('dynamicContentLog', this.dynamicContentLogEvent);
+
+    window.clearTimeout(this.checkReadyTimer);
   },
 
   data() {
-    const versionInfo = getVersionData();
     const enabledSetting = this.$store.getters['management/byId'](MANAGEMENT.SETTING, SETTING.DYNAMIC_CONTENT_ENABLED);
     const mode = enabledSetting?.value || false;
     let enabled = enabledSetting?.value === 'debug';
 
     let content = '';
-    let version = versionInfo.Version.split('-')[0];
+    const version = getVersion().split('-')[0];
     let logs = [];
 
+    console.log(version);
+
     const config = getConfig(this.$store.getters);
+
+    let ready = false;
 
     try {
       content = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_UPDATE_CONTENT) || '{}');
 
       const data = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_TEST_DATA) || '{}');
+
+      if (Object.keys(content).length > 0) {
+        ready = true;
+      }
 
       if (!content.settings?.debugVersion) {
         enabled = false;
@@ -57,21 +67,39 @@ export default {
 
       if (JSON.stringify(data) !== JSON.stringify(content)) {
         enabled = false;
+        console.error('Test data does not match update content, disabling debug mode');
       }
 
       logs = JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_CONTENT_DEBUG_LOG) || '[]');
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
 
-    return {
+    const data = {
       content: JSON.stringify(content, null, 2),
       version,
       logs,
       enabled,
       mode,
       config,
+      ready,
     };
+
+    console.error(data);
+    return data;
   },
   methods: {
+    checkReady() {
+      this.checkReadyTimer = setInterval(() => {
+        const content = window.localStorage.getItem(LOCAL_STORAGE_UPDATE_CONTENT) || '{}';
+
+        if (Object.keys(JSON.parse(content)).length > 0) {
+          this.ready = true;
+        } else {
+          this.checkReady();
+        }
+      }, 1500);
+    },
     save() {
       const c = JSON.parse(this.content);
 
@@ -104,34 +132,54 @@ export default {
     },
 
     async resetPrefs() {
-      await this.$store.dispatch('prefs/set', { key: READ_NEW_RELEASE, value: '' });
-      await this.$store.dispatch('prefs/set', { key: READ_SUPPORT_NOTICE, value: '' });
-      await this.$store.dispatch('prefs/set', { key: READ_UPCOMING_SUPPORT_NOTICE, value: '' });
+      // Done this way, so compatible with shell that does not have Dynamic Content prefs specified
+      const all = await this.$store.dispatch('management/findAll', {
+        type: STEVE.PREFERENCE,
+        opt:  {
+          url:                  'userpreferences',
+          force:                true,
+          watch:                false,
+          redirectUnauthorized: false,
+          stream:               false,
+        }
+      }, { root: true });
+
+      const server = all?.[0];
+
+      server.data[READ_NEW_RELEASE] = '""';
+      server.data[READ_SUPPORT_NOTICE] = '""';
+      server.data[READ_UPCOMING_SUPPORT_NOTICE] = '""';
+
+      await server.save();
     },
 
     async configure(mode) {
-      const setting = await fetchOrCreateSetting(this.$store, SETTING.DYNAMIC_CONTENT_ENABLED, mode);
+      try {
+        const setting = await fetchOrCreateSetting(this.$store, SETTING.DYNAMIC_CONTENT_ENABLED, mode);
 
-      setting.value = mode;
+        setting.value = mode;
 
-      await setting.save();
+        await setting.save();
 
-      if (mode === 'debug') {
-        this.content = window.localStorage.getItem(LOCAL_STORAGE_UPDATE_CONTENT) || '{}';
+        if (mode === 'debug') {
+          this.content = window.localStorage.getItem(LOCAL_STORAGE_UPDATE_CONTENT) || '{}';
 
-        this.save();
-      } else {
-        const c = JSON.parse(this.content);
+          this.save();
+        } else {
+          const c = JSON.parse(this.content);
 
-        delete c.settings?.debugVersion;
+          delete c.settings?.debugVersion;
 
-        // Clear out local storage
-        window.localStorage.removeItem(LOCAL_STORAGE_UPDATE_FETCH_DATE);
-        window.localStorage.setItem(LOCAL_STORAGE_UPDATE_CONTENT, JSON.stringify(c));
-        window.localStorage.removeItem(LOCAL_STORAGE_TEST_DATA);
-        window.localStorage.removeItem(LOCAL_STORAGE_CONTENT_DEBUG_LOG);
+          // Clear out local storage
+          window.localStorage.removeItem(LOCAL_STORAGE_UPDATE_FETCH_DATE);
+          window.localStorage.setItem(LOCAL_STORAGE_UPDATE_CONTENT, JSON.stringify(c));
+          window.localStorage.removeItem(LOCAL_STORAGE_TEST_DATA);
+          window.localStorage.removeItem(LOCAL_STORAGE_CONTENT_DEBUG_LOG);
 
-        window.location.reload();
+          window.location.reload();
+        }
+      } catch (e) {
+        console.error('Error updating setting', e);
       }
     }
   },
@@ -164,12 +212,20 @@ export default {
   <div class="content-header">
     <h1>Dynamic Content Test</h1>
     <button
-      v-if="!enabled"
+      v-if="!enabled && ready"
       type="button"
       class="role-primary btn"
       @click="configure('debug')"
     >
       Enable Debug Mode
+    </button>
+    <button
+      v-else-if="!enabled && !ready"
+      type="button"
+      disabled="true"
+      class="role-primary btn"
+    >
+      Waiting for content...
     </button>
     <button
       v-else
@@ -222,7 +278,7 @@ export default {
           </button>
           <button
             type="button"
-            class="role-primary btn"
+            class="role-primary btn ml-10"
             @click="resetPrefs()"
           >
             Reset Read Prefs
