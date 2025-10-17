@@ -2,11 +2,10 @@
 import day from 'dayjs';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { getVersionData } from '@shell/config/version';
-import { READ_NEW_RELEASE, READ_SUPPORT_NOTICE, READ_UPCOMING_SUPPORT_NOTICE } from '@shell/store/prefs';
 import { MANAGEMENT } from '@shell/config/types';
 import { SETTING } from '@shell/config/settings';
 import { fetchOrCreateSetting } from '@shell/utils/settings';
-import { getConfig } from '@shell/utils/dynamic-content/config';
+import { getConfig } from '../utils/config';
 
 const UPDATE_DATE_FORMAT = 'YYYY-MM-DD'; // Format of the fetch date
 
@@ -14,6 +13,11 @@ const LOCAL_STORAGE_UPDATE_FETCH_DATE = 'rancher-updates-fetch-next'; // Local s
 const LOCAL_STORAGE_UPDATE_CONTENT = 'rancher-updates-last-content';
 const LOCAL_STORAGE_TEST_DATA = 'rancher-updates-test-data';
 const LOCAL_STORAGE_CONTENT_DEBUG_LOG = 'rancher-updates-debug-log';
+
+// Dynamic content
+export const READ_NEW_RELEASE = 'read-new-release';
+export const READ_SUPPORT_NOTICE = 'read-support-notice';
+export const READ_UPCOMING_SUPPORT_NOTICE = 'read-upcoming-support-notice';
 
 export default {
   name:       'DynamicContentTestPage',
@@ -34,7 +38,7 @@ export default {
     const mode = enabledSetting?.value || false;
     let enabled = enabledSetting?.value === 'debug';
 
-    let content;
+    let content = '';
     let version = versionInfo.Version.split('-')[0];
     let logs = [];
 
