@@ -1,12 +1,13 @@
 {
   "name": "dynamic-content-test",
-  "description": "Test Dynamic Content",
-  "version": "1.0.0",
+  "description": "UI to help test the Dynamic Content feature",
+  "version": "1.0.1",
   "private": false,
   "rancher": {
     "annotations": {
       "catalog.cattle.io/rancher-version": ">= v2.10.0",
-      "catalog.cattle.io/display-name": "Test Dynamic Content"
+      "catalog.cattle.io/display-name": "Test Dynamic Content",
+      "catalog.cattle.io/ui-extensions-version": ">= 3.0.0 < 4.0.0"
     }
   },
 
