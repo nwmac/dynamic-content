@@ -10,6 +10,26 @@ entries:
       catalog.cattle.io/rancher-version: '>= v2.10.0'
       catalog.cattle.io/scope: management
       catalog.cattle.io/ui-component: plugins
+      catalog.cattle.io/ui-extensions-version: '>= 3.0.0 < 4.0.0'
+    apiVersion: v2
+    appVersion: 1.0.1
+    created: "2025-10-17T10:08:29.44007929Z"
+    description: UI to help test the Dynamic Content feature
+    digest: 7092c2678b31ebe6b9f1a4e714f02ab86d3d3345baf667371ee3dc0fa763313b
+    name: dynamic-content-test
+    type: application
+    urls:
+    - assets/dynamic-content/dynamic-content-test-1.0.1.tgz
+    version: 1.0.1
+  - annotations:
+      catalog.cattle.io/certified: rancher
+      catalog.cattle.io/display-name: Test Dynamic Content
+      catalog.cattle.io/namespace: cattle-ui-plugin-system
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/permits-os: linux, windows
+      catalog.cattle.io/rancher-version: '>= v2.10.0'
+      catalog.cattle.io/scope: management
+      catalog.cattle.io/ui-component: plugins
     apiVersion: v2
     appVersion: 1.0.0
     created: "2025-10-17T10:00:27.393629757Z"
@@ -20,4 +40,4 @@ entries:
     urls:
     - assets/dynamic-content/dynamic-content-test-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-17T10:00:27.392807667Z"
+generated: "2025-10-17T10:08:29.439635613Z"
