@@ -104,7 +104,7 @@ export default {
       const c = JSON.parse(this.content);
 
       c.settings = c.settings || {};
-      c.settings.debugVersion = this.version;
+      c.settings.debugVersion = c.settings.debugVersion || this.version;
 
       window.localStorage.setItem(LOCAL_STORAGE_TEST_DATA, JSON.stringify(c));
       window.localStorage.setItem(LOCAL_STORAGE_UPDATE_CONTENT, JSON.stringify(c));
