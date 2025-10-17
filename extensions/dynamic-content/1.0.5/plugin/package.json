@@ -1,0 +1,19 @@
+{
+  "name": "dynamic-content",
+  "description": "UI to help test the Dynamic Content feature",
+  "version": "1.0.5",
+  "private": false,
+  "rancher": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "@vue/cli-plugin-typescript": "~5.0.0"
+  },
+  "files": [
+    "**/*"
+  ],
+  "main": "dynamic-content-1.0.5.umd.min.js"
+}
