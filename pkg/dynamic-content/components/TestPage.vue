@@ -41,10 +41,8 @@ export default {
     let enabled = enabledSetting?.value === 'debug';
 
     let content = '';
-    const version = getVersion().split('-')[0];
+    let version = getVersion().split('-')[0];
     let logs = [];
-
-    console.log(version);
 
     const config = getConfig(this.$store.getters);
 
@@ -75,6 +73,15 @@ export default {
       console.error(e);
     }
 
+    // Remove content settings debugVersion before displaying
+    if (content.settings?.debugVersion) {
+      delete content.settings.debugVersion;
+
+      if (Object.keys(content.settings).length === 0) {
+        delete content.settings;
+      }
+    }
+
     const data = {
       content: JSON.stringify(content, null, 2),
       version,
@@ -85,7 +92,8 @@ export default {
       ready,
     };
 
-    console.error(data);
+    console.log(data);
+
     return data;
   },
   methods: {
@@ -172,7 +180,7 @@ export default {
 
           // Clear out local storage
           window.localStorage.removeItem(LOCAL_STORAGE_UPDATE_FETCH_DATE);
-          window.localStorage.setItem(LOCAL_STORAGE_UPDATE_CONTENT, JSON.stringify(c));
+          window.localStorage.removeItem(LOCAL_STORAGE_UPDATE_CONTENT);
           window.localStorage.removeItem(LOCAL_STORAGE_TEST_DATA);
           window.localStorage.removeItem(LOCAL_STORAGE_CONTENT_DEBUG_LOG);
 
